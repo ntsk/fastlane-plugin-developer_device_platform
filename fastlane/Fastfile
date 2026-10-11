@@ -1,0 +1,7 @@
+lane :test do
+  developer_device_platform(
+    devices: ["shiba-34"],
+    test_apk: "app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
+    apps: ["app/build/outputs/apk/debug/app-debug.apk"]
+  )
+end

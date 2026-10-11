@@ -1,0 +1,93 @@
+require:
+  - rubocop-performance
+  - rubocop-require_tools
+
+AllCops:
+  TargetRubyVersion: 3.1
+  NewCops: enable
+  SuggestExtensions: false
+  Exclude:
+    - vendor/**/*
+    - coverage/**/*
+
+Style/Documentation:
+  Enabled: false
+Style/FrozenStringLiteralComment:
+  Enabled: false
+Style/StringLiterals:
+  Enabled: false
+Style/ClassAndModuleChildren:
+  Enabled: false
+Style/SymbolArray:
+  Enabled: false
+Style/WordArray:
+  Enabled: false
+Style/IfUnlessModifier:
+  Enabled: false
+Style/GuardClause:
+  Enabled: false
+Style/MethodCallWithArgsParentheses:
+  Enabled: true
+  AllowedMethods:
+    - require
+    - require_relative
+    - gem
+    - raise
+    - attr_reader
+    - attr_accessor
+    - desc
+    - lane
+    - private_lane
+    - platform
+    - describe
+    - it
+    - be
+    - context
+    - before
+    - after
+    - subject
+    - let
+    - task
+    - source
+    - eval_gemfile
+    - puts
+    - include
+    - private_constant
+
+Layout/LineLength:
+  Max: 140
+Layout/HashAlignment:
+  Enabled: false
+Layout/FirstHashElementIndentation:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+Metrics/MethodLength:
+  Max: 30
+Metrics/ClassLength:
+  Max: 200
+Metrics/AbcSize:
+  Max: 30
+Metrics/CyclomaticComplexity:
+  Max: 12
+Metrics/PerceivedComplexity:
+  Max: 12
+Metrics/ParameterLists:
+  Max: 8
+
+Naming/PredicateName:
+  Enabled: false
+
+Lint/UnusedMethodArgument:
+  Enabled: false
+
+Require/MissingRequireStatement:
+  Exclude:
+    - "**/spec/**/*.rb"
+    - "**/*.gemspec"
+    - "**/Gemfile"
+    - "**/Rakefile"
+    - "**/Fastfile"
+    - "**/Pluginfile"
+    - lib/fastlane/plugin/developer_device_platform.rb

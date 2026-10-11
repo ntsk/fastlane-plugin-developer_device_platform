@@ -1,0 +1,12 @@
+.DS_Store
+
+*.gem
+Gemfile.lock
+vendor/bundle
+.bundle/config
+
+coverage/
+fastlane/README.md
+fastlane/report.xml
+
+*.apk
