@@ -96,3 +96,6 @@ Require/MissingRequireStatement:
     - "**/Fastfile"
     - "**/Pluginfile"
     - lib/fastlane/plugin/developer_device_platform.rb
+
+Naming/BlockForwarding:
+  EnforcedStyle: explicit
