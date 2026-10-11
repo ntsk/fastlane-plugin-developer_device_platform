@@ -71,7 +71,7 @@ developer_device_platform(
 
 ### Options
 
-Options mirror the flags of `gcloud beta device-run sessions submit instrumentation`. Every option can also be set through the environment variable `DEVELOPER_DEVICE_PLATFORM_<OPTION>`.
+Options mirror the flags of `gcloud beta device-run sessions submit instrumentation`. Every option except the hash-valued ones (`additional_test_options`, `other_files_to_push`, `labels`) can also be set through the environment variable `DEVELOPER_DEVICE_PLATFORM_<OPTION>`; array values are comma-separated.
 
 | Option | Type | Description |
 | --- | --- | --- |
