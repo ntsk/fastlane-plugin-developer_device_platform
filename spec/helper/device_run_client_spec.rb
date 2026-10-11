@@ -36,6 +36,35 @@ describe Fastlane::DeveloperDevicePlatform::DeviceRunClient do
     end
   end
 
+  describe "when gcloud cannot run device-run commands" do
+    def command_error(stderr)
+      Fastlane::DeveloperDevicePlatform::Gcloud::CommandError.new(%w[gcloud beta device-run sessions wait x], stderr, 2)
+    end
+
+    it "explains that the installed gcloud is too old when device-run is not a known command" do
+      allow(gcloud).to receive(:run).and_raise(command_error("ERROR: (gcloud.beta) Invalid choice: 'device-run'.\n"))
+
+      expect { client.wait("x", location: "global") }
+        .to raise_error(described_class::Error, /Google Cloud CLI 580\.0\.0 or newer/)
+    end
+
+    it "explains how to install the beta component when it is missing" do
+      stderr = "ERROR: (gcloud) You do not currently have this command group installed. " \
+               "Using it requires the installation of components: [beta]\n"
+      allow(gcloud).to receive(:run).and_raise(command_error(stderr))
+
+      expect { client.wait("x", location: "global") }
+        .to raise_error(described_class::Error, /gcloud components install beta/)
+    end
+
+    it "passes other gcloud failures through untouched" do
+      allow(gcloud).to receive(:run).and_raise(command_error("ERROR: PERMISSION_DENIED\n"))
+
+      expect { client.wait("x", location: "global") }
+        .to raise_error(Fastlane::DeveloperDevicePlatform::Gcloud::CommandError, /PERMISSION_DENIED/)
+    end
+  end
+
   describe "#wait" do
     it "blocks on the session in the given location" do
       expect(gcloud).to receive(:run)
