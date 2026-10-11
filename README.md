@@ -17,7 +17,7 @@ Firebase Test Lab is [deprecated and shuts down on September 30, 2027](https://f
 
 ## Prerequisites
 
-- [Google Cloud CLI](https://cloud.google.com/sdk/docs/install) on the machine running fastlane (`gcloud components update` if it predates Device Run).
+- [Google Cloud CLI](https://cloud.google.com/sdk/docs/install) 580.0.0 or newer with the `beta` component on the machine running fastlane (`gcloud components update && gcloud components install beta`). On GitHub Actions, pin `version` in `google-github-actions/setup-gcloud`; its default `latest` can resolve to an older release that predates Device Run.
 - A Google Cloud project with billing enabled and the APIs turned on:
 
   ```sh
