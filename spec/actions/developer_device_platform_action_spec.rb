@@ -67,12 +67,49 @@ describe Fastlane::Actions::DeveloperDevicePlatformAction do
       expect(lane_context[:DEVELOPER_DEVICE_PLATFORM_DOWNLOAD_DIR]).to be_nil
     end
 
-    it "downloads results when download_dir is given" do
-      expect(client).to receive(:download).with(session, "build/device-run").and_return("build/device-run/3f9c2a1e")
+    it "downloads results when download_dir is given and lists the junit reports" do
+      Dir.mktmpdir do |dir|
+        local = File.join(dir, "3f9c2a1e")
+        expect(client).to receive(:download).with(session, dir) do
+          %w[job-001 job-000].each do |job|
+            FileUtils.mkdir_p(File.join(local, job, "execution-000"))
+            File.write(File.join(local, job, "junit.xml"), "<testsuite/>")
+            File.write(File.join(local, job, "execution-000", "logcat.txt"), "")
+          end
+          local
+        end
 
-      run_lane('download_dir: "build/device-run"')
+        run_lane("download_dir: \"#{dir}\"")
 
-      expect(lane_context[:DEVELOPER_DEVICE_PLATFORM_DOWNLOAD_DIR]).to eq("build/device-run/3f9c2a1e")
+        expect(lane_context[:DEVELOPER_DEVICE_PLATFORM_DOWNLOAD_DIR]).to eq(local)
+        expect(lane_context[:DEVELOPER_DEVICE_PLATFORM_JUNIT_FILES]).to eq(
+          [File.join(local, "job-000", "junit.xml"), File.join(local, "job-001", "junit.xml")]
+        )
+      end
+    end
+
+    it "leaves the junit list empty when nothing was downloaded" do
+      run_lane
+
+      expect(lane_context[:DEVELOPER_DEVICE_PLATFORM_JUNIT_FILES]).to be_nil
+    end
+  end
+
+  describe "a run that is interrupted while waiting" do
+    it "cancels the session before propagating the interrupt" do
+      allow(client).to receive(:wait).and_raise(Interrupt)
+      expect(client).to receive(:cancel).with("3f9c2a1e", location: "global")
+
+      expect { run_lane }.to raise_error(Interrupt)
+      expect(lane_context[:DEVELOPER_DEVICE_PLATFORM_SESSION_ID]).to eq("3f9c2a1e")
+    end
+
+    it "still propagates the interrupt when cancelling fails" do
+      allow(client).to receive(:wait).and_raise(Interrupt)
+      error = Fastlane::DeveloperDevicePlatform::Gcloud::CommandError.new(%w[gcloud beta device-run sessions cancel], "boom", 1)
+      allow(client).to receive(:cancel).and_raise(error)
+
+      expect { run_lane }.to raise_error(Interrupt)
     end
   end
 
@@ -97,13 +134,18 @@ describe Fastlane::Actions::DeveloperDevicePlatformAction do
   end
 
   describe "an asynchronous run" do
-    it "returns right after submission without waiting" do
+    let(:fixture) { "session_running.json" }
+
+    it "returns right after submission and exposes where the results will land" do
       expect(client).not_to receive(:wait)
-      expect(client).not_to receive(:describe)
+      expect(client).not_to receive(:download)
+      expect(client).to receive(:describe).with("3f9c2a1e", location: "global").and_return(session)
 
       expect(run_lane("async: true")).to eq("3f9c2a1e")
       expect(lane_context[:DEVELOPER_DEVICE_PLATFORM_SESSION_ID]).to eq("3f9c2a1e")
       expect(lane_context[:DEVELOPER_DEVICE_PLATFORM_RESULT]).to be_nil
+      expect(lane_context[:DEVELOPER_DEVICE_PLATFORM_OUTPUT_DIRECTORY]).to eq("gs://my-project-devicerun/automation/sessions/3f9c2a1e")
+      expect(lane_context[:DEVELOPER_DEVICE_PLATFORM_CONSOLE_URL]).to end_with("/automation/sessions/3f9c2a1e/")
     end
   end
 
@@ -164,7 +206,8 @@ describe Fastlane::Actions::DeveloperDevicePlatformAction do
       "DEVELOPER_DEVICE_PLATFORM_RESULT",
       "DEVELOPER_DEVICE_PLATFORM_OUTPUT_DIRECTORY",
       "DEVELOPER_DEVICE_PLATFORM_CONSOLE_URL",
-      "DEVELOPER_DEVICE_PLATFORM_DOWNLOAD_DIR"
+      "DEVELOPER_DEVICE_PLATFORM_DOWNLOAD_DIR",
+      "DEVELOPER_DEVICE_PLATFORM_JUNIT_FILES"
     )
     expect(described_class.example_code).not_to be_empty
   end

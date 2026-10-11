@@ -75,6 +75,16 @@ describe Fastlane::DeveloperDevicePlatform::DeviceRunClient do
     end
   end
 
+  describe "#cancel" do
+    it "cancels the session in the given location" do
+      expect(gcloud).to receive(:run)
+        .with("beta", "device-run", "sessions", "cancel", "3f9c2a1e", "--location=global")
+        .and_return(output)
+
+      client.cancel("3f9c2a1e", location: "global")
+    end
+  end
+
   describe "#describe" do
     it "fetches the full session as json and parses it" do
       expect(gcloud).to receive(:run)
