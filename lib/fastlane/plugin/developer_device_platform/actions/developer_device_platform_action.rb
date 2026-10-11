@@ -131,7 +131,7 @@ module Fastlane
           ["DEVELOPER_DEVICE_PLATFORM_OUTPUT_DIRECTORY", "Cloud Storage directory (gs://...) holding the session artifacts"],
           ["DEVELOPER_DEVICE_PLATFORM_CONSOLE_URL", "Cloud Console URL of the session artifacts"],
           ["DEVELOPER_DEVICE_PLATFORM_DOWNLOAD_DIR", "Local directory the artifacts were downloaded to, when download_dir is set"],
-          ["DEVELOPER_DEVICE_PLATFORM_JUNIT_FILES", "Local paths of the downloaded junit.xml reports (one per job), when download_dir is set"]
+          ["DEVELOPER_DEVICE_PLATFORM_JUNIT_FILES", "Downloaded junit.xml paths, one per job, when download_dir is set"]
         ]
       end
 
