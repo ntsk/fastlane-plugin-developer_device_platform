@@ -105,7 +105,7 @@ Options mirror the flags of `gcloud beta device-run sessions submit instrumentat
 | `flaky_test_attempts` | Integer | Attempts per shard. Default `1`. |
 | `flaky_test_parallel_retry` | Boolean | Retry in parallel instead of sequentially. |
 | `flaky_test_retry_level` | String | `shard` or `test`. |
-| `async` | Boolean | Return the session ID right after submission. Default `false`. |
+| `async` | Boolean | Return the session ID right after submission; the output directory and console URL are still exposed. Default `false`. |
 | `download_dir` | String | Local directory to download the session artifacts into. |
 | `fail_on_failure` | Boolean | Fail the lane when the result is not `PASSED`. Default `true`. |
 
@@ -120,6 +120,7 @@ The action returns a `Fastlane::DeveloperDevicePlatform::Session` (or the sessio
 | `DEVELOPER_DEVICE_PLATFORM_OUTPUT_DIRECTORY` | `gs://BUCKET/automation/sessions/SESSION_ID` |
 | `DEVELOPER_DEVICE_PLATFORM_CONSOLE_URL` | Cloud Console link to the artifacts |
 | `DEVELOPER_DEVICE_PLATFORM_DOWNLOAD_DIR` | Local artifact directory when `download_dir` is set |
+| `DEVELOPER_DEVICE_PLATFORM_JUNIT_FILES` | Local `junit.xml` paths, one per job, when `download_dir` is set |
 
 ```ruby
 session = developer_device_platform(devices: ["shiba-34"], test_apk: "test.apk", fail_on_failure: false)
@@ -128,7 +129,9 @@ session.jobs.each { |job| puts "#{job.display_name}: #{job.result} #{job.message
 
 ### Results
 
-Artifacts land in `gs://BUCKET/automation/sessions/SESSION_ID/job-NNN/`: `merged_junit.xml` per job, and `junit.xml`, `instrumentation.log`, `logcat.txt`, `video.mp4` and pulled files per execution. With `download_dir` the same tree is copied to `<download_dir>/<SESSION_ID>/`, so JUnit reporters can pick up `**/merged_junit.xml`.
+Artifacts land in `gs://BUCKET/automation/sessions/SESSION_ID/job-NNN/`: a `junit.xml` per job, and `test_result.xml`, `instrument.log`, `logcat.txt`, video recordings and pulled files under `execution-NNN/`. With `download_dir` the same tree is copied to `<download_dir>/<SESSION_ID>/` and the `junit.xml` paths are exposed in `DEVELOPER_DEVICE_PLATFORM_JUNIT_FILES` for JUnit reporters.
+
+Interrupting fastlane while it waits (Ctrl-C, or a cancelled CI job) cancels the Device Run session before exiting, so no job keeps running unattended.
 
 ### Authentication
 

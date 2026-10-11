@@ -35,6 +35,11 @@ module Fastlane
         nil
       end
 
+      def cancel(session_id, location:)
+        device_run("sessions", "cancel", session_id, "--location=#{location}")
+        nil
+      end
+
       def describe(session_id, location:)
         output = device_run("sessions", "describe", session_id, "--location=#{location}", "--full", "--format=json")
         Session.parse(output.stdout)
