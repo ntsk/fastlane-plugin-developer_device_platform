@@ -1,8 +1,6 @@
 describe Fastlane::Actions::DeveloperDevicePlatformAction do
   let(:client) { instance_double(Fastlane::DeveloperDevicePlatform::DeviceRunClient) }
-  let(:session) do
-    Fastlane::DeveloperDevicePlatform::Session.parse(File.read(File.join(__dir__, "..", "fixtures", fixture)))
-  end
+  let(:session) { Fastlane::DeveloperDevicePlatform::Session.parse(File.read(fixture_path(fixture))) }
   let(:fixture) { "session_failed.json" }
   let(:lane_context) { Fastlane::Actions.lane_context }
 
@@ -15,13 +13,17 @@ describe Fastlane::Actions::DeveloperDevicePlatformAction do
     lane_context.clear
   end
 
+  def fixture_path(name)
+    File.expand_path(File.join(__dir__, "..", "fixtures", name))
+  end
+
   def run_lane(options = "")
     Fastlane::FastFile.new.parse(<<~FASTFILE).runner.execute(:test)
       lane :test do
         developer_device_platform(
           devices: ["shiba-34", "tokay-36"],
-          test_apk: "spec/fixtures/fake_gcloud",
-          apps: ["spec/fixtures/fake_gcloud"],
+          test_apk: "#{fixture_path('fake_gcloud')}",
+          apps: ["#{fixture_path('fake_gcloud')}"],
           #{options}
         )
       end
@@ -35,14 +37,14 @@ describe Fastlane::Actions::DeveloperDevicePlatformAction do
       expect(Fastlane::DeveloperDevicePlatform::DeviceRunClient).to receive(:new) do |gcloud:|
         expect(gcloud.binary).to eq("gcloud")
         expect(gcloud.project).to eq("my-project")
-        expect(gcloud.credential_file).to eq("spec/fixtures/session_passed.json")
+        expect(gcloud.credential_file).to eq(fixture_path("session_passed.json"))
         client
       end
       expect(client).to receive(:submit) do |command|
         expect(command.arguments).to include(
           "--device=shiba-34,tokay-36",
-          "--test=spec/fixtures/fake_gcloud",
-          "--apps=spec/fixtures/fake_gcloud",
+          "--test=#{fixture_path('fake_gcloud')}",
+          "--apps=#{fixture_path('fake_gcloud')}",
           "--location=global",
           "--instrumentation-timeout=10m"
         )
@@ -53,7 +55,7 @@ describe Fastlane::Actions::DeveloperDevicePlatformAction do
 
       result = run_lane(<<~OPTIONS)
         project_id: "my-project",
-        service_account_key_file: "spec/fixtures/session_passed.json",
+        service_account_key_file: "#{fixture_path('session_passed.json')}",
         instrumentation_timeout: "10m"
       OPTIONS
 
