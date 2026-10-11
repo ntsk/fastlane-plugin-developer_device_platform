@@ -83,13 +83,19 @@ module Fastlane
       def option(key, description, type: String, optional: true, default_value: nil, verify_block: nil)
         FastlaneCore::ConfigItem.new(
           key: key,
-          env_name: "DEVELOPER_DEVICE_PLATFORM_#{key.to_s.upcase}",
+          env_name: env_name_for(key, type),
           description: description,
           type: type,
           optional: optional,
           default_value: default_value,
           verify_block: verify_block
         )
+      end
+
+      def env_name_for(key, type)
+        return nil if type == Hash
+
+        "DEVELOPER_DEVICE_PLATFORM_#{key.to_s.upcase}"
       end
 
       def enum_option(key, description, values)
