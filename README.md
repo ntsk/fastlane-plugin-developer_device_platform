@@ -1,5 +1,6 @@
 # fastlane-plugin-developer_device_platform
 
+[![fastlane Plugin Badge](https://rawcdn.githack.com/fastlane/fastlane/master/fastlane/assets/plugin-badge.svg)](https://rubygems.org/gems/fastlane-plugin-developer_device_platform)
 [![Test](https://github.com/ntsk/fastlane-plugin-developer_device_platform/actions/workflows/test.yml/badge.svg)](https://github.com/ntsk/fastlane-plugin-developer_device_platform/actions/workflows/test.yml)
 
 Run Android instrumentation tests on [Google Cloud Developer Device Platform](https://docs.cloud.google.com/developer-device-platform) (Device Run) from fastlane.
