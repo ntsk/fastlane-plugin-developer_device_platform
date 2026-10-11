@@ -1,0 +1,149 @@
+{
+  "name": "projects/my-project/locations/global/sessions/3f9c2a1e",
+  "sessionConfig": {
+    "displayName": "instrumentation-session",
+    "jobConfigs": [
+      {
+        "allocationConfig": {
+          "deviceConfigs": [
+            {
+              "requirement": {
+                "deviceId": "shiba-34"
+              }
+            }
+          ]
+        },
+        "action": {
+          "androidInstrumentationTest": {
+            "testInstallable": {
+              "files": [
+                {
+                  "gcsInputFile": {
+                    "path": "gs://my-project-devicerun/automation/inputs/2026-10-11_10:00.000000_AB12/app-debug-androidTest.apk"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "allocationConfig": {
+          "deviceConfigs": [
+            {
+              "requirement": {
+                "deviceId": "tokay-36"
+              }
+            }
+          ]
+        },
+        "action": {
+          "androidInstrumentationTest": {
+            "testInstallable": {
+              "files": [
+                {
+                  "gcsInputFile": {
+                    "path": "gs://my-project-devicerun/automation/inputs/2026-10-11_10:00.000000_AB12/app-debug-androidTest.apk"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    ],
+    "outputDirectoryConfig": {
+      "gcsOutputDirectory": {
+        "path": "gs://my-project-devicerun/automation/sessions"
+      }
+    }
+  },
+  "sessionReport": {
+    "id": "3f9c2a1e",
+    "status": {
+      "statusType": "DONE",
+      "progressMessages": [
+        "Session finished."
+      ]
+    },
+    "result": {
+      "resultType": "PASSED"
+    },
+    "startTime": "2026-10-11T10:00:00Z",
+    "endTime": "2026-10-11T10:12:34Z",
+    "jobReports": [
+      {
+        "id": "job-a",
+        "displayName": "job-000",
+        "status": {
+          "statusType": "DONE",
+          "progressMessages": [
+            "Job finished."
+          ]
+        },
+        "result": {
+          "resultType": "PASSED"
+        },
+        "outputFiles": [
+          {
+            "gcsOutputFile": {
+              "path": "gs://my-project-devicerun/automation/sessions/3f9c2a1e/job-000/merged_junit.xml"
+            }
+          }
+        ],
+        "executionReports": [
+          {
+            "id": "exec-a",
+            "displayName": "execution-000",
+            "status": {
+              "statusType": "DONE",
+              "progressMessages": [
+                "7 test cases passed."
+              ]
+            },
+            "result": {
+              "resultType": "PASSED"
+            },
+            "outputFiles": [
+              {
+                "gcsOutputFile": {
+                  "path": "gs://my-project-devicerun/automation/sessions/3f9c2a1e/job-000/execution-000/junit.xml"
+                }
+              },
+              {
+                "gcsOutputFile": {
+                  "path": "gs://my-project-devicerun/automation/sessions/3f9c2a1e/job-000/execution-000/logcat.txt"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "job-b",
+        "displayName": "job-001",
+        "status": {
+          "statusType": "DONE"
+        },
+        "result": {
+          "resultType": "PASSED"
+        },
+        "executionReports": [
+          {
+            "id": "exec-b",
+            "displayName": "execution-000",
+            "status": {
+              "statusType": "DONE",
+              "progressMessages": [
+                "7 test cases passed."
+              ]
+            },
+            "result": {
+              "resultType": "PASSED"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
