@@ -36,6 +36,16 @@ describe Fastlane::DeveloperDevicePlatform::Gcloud do
     expect(lines).to eq(["first stderr line", "second stderr line"])
   end
 
+  it "does not stream blank stderr lines but keeps them in the captured output" do
+    ENV["FAKE_GCLOUD_STDERR"] = "Uploading [test.apk].\n\nCreating session [abc] in location [global]."
+    lines = []
+
+    output = described_class.new(binary: binary).run("version") { |line| lines << line }
+
+    expect(lines).to eq(["Uploading [test.apk].", "Creating session [abc] in location [global].", "second stderr line"])
+    expect(output.stderr).to include("\n\n")
+  end
+
   it "raises an error carrying the command and stderr when the exit status is non-zero" do
     ENV["FAKE_GCLOUD_EXIT"] = "2"
     ENV["FAKE_GCLOUD_STDERR"] = "ERROR: (gcloud.beta.device-run) something broke"
