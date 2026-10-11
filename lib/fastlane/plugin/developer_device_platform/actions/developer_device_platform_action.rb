@@ -13,6 +13,7 @@ module Fastlane
       DEVELOPER_DEVICE_PLATFORM_OUTPUT_DIRECTORY = :DEVELOPER_DEVICE_PLATFORM_OUTPUT_DIRECTORY
       DEVELOPER_DEVICE_PLATFORM_CONSOLE_URL = :DEVELOPER_DEVICE_PLATFORM_CONSOLE_URL
       DEVELOPER_DEVICE_PLATFORM_DOWNLOAD_DIR = :DEVELOPER_DEVICE_PLATFORM_DOWNLOAD_DIR
+      DEVELOPER_DEVICE_PLATFORM_JUNIT_FILES = :DEVELOPER_DEVICE_PLATFORM_JUNIT_FILES
     end
 
     class DeveloperDevicePlatformAction < Action
@@ -31,11 +32,12 @@ module Fastlane
         session_id = client.submit(build_command(params)) { |line| UI.message(line) }
         lane_context[SharedValues::DEVELOPER_DEVICE_PLATFORM_SESSION_ID] = session_id
         UI.success("Created Device Run session #{session_id}")
-        return session_id if params[:async]
+        if params[:async]
+          publish(client.describe(session_id, location: location))
+          return session_id
+        end
 
-        UI.message("Waiting for session #{session_id} to complete...")
-        client.wait(session_id, location: location) { |line| UI.message(line) }
-        session = client.describe(session_id, location: location)
+        session = await(client, session_id, location)
         publish(session)
         download(client, session, params[:download_dir])
         UI.message(DeveloperDevicePlatform::SessionSummary.new(session).to_s)
@@ -56,6 +58,23 @@ module Fastlane
         DeveloperDevicePlatform::InstrumentationCommand.new(**COMMAND_OPTIONS.to_h { |key| [key, params[key]] })
       end
 
+      def self.await(client, session_id, location)
+        UI.message("Waiting for session #{session_id} to complete...")
+        client.wait(session_id, location: location) { |line| UI.message(line) }
+        client.describe(session_id, location: location)
+      rescue SignalException
+        cancel(client, session_id, location)
+        raise
+      end
+
+      def self.cancel(client, session_id, location)
+        UI.important("Interrupted. Cancelling Device Run session #{session_id}...")
+        client.cancel(session_id, location: location)
+        UI.important("Cancelled Device Run session #{session_id}")
+      rescue *RECOVERABLE_ERRORS => e
+        UI.error("Could not cancel Device Run session #{session_id}: #{e.message}")
+      end
+
       def self.publish(session)
         lane_context[SharedValues::DEVELOPER_DEVICE_PLATFORM_RESULT] = session.result
         lane_context[SharedValues::DEVELOPER_DEVICE_PLATFORM_OUTPUT_DIRECTORY] = session.output_directory
@@ -68,6 +87,7 @@ module Fastlane
         UI.message("Downloading results of session #{session.id} to #{destination}...")
         local_path = client.download(session, destination) { |line| UI.verbose(line) }
         lane_context[SharedValues::DEVELOPER_DEVICE_PLATFORM_DOWNLOAD_DIR] = local_path
+        lane_context[SharedValues::DEVELOPER_DEVICE_PLATFORM_JUNIT_FILES] = Dir.glob(File.join(local_path, "**", "junit.xml"))
         UI.success("Results downloaded to #{local_path}")
       end
 
@@ -110,7 +130,8 @@ module Fastlane
           ["DEVELOPER_DEVICE_PLATFORM_RESULT", "Overall result (PASSED, FAILED, ERROR, TIMED_OUT, CANCELLED)"],
           ["DEVELOPER_DEVICE_PLATFORM_OUTPUT_DIRECTORY", "Cloud Storage directory (gs://...) holding the session artifacts"],
           ["DEVELOPER_DEVICE_PLATFORM_CONSOLE_URL", "Cloud Console URL of the session artifacts"],
-          ["DEVELOPER_DEVICE_PLATFORM_DOWNLOAD_DIR", "Local directory the artifacts were downloaded to, when download_dir is set"]
+          ["DEVELOPER_DEVICE_PLATFORM_DOWNLOAD_DIR", "Local directory the artifacts were downloaded to, when download_dir is set"],
+          ["DEVELOPER_DEVICE_PLATFORM_JUNIT_FILES", "Local paths of the downloaded junit.xml reports (one per job), when download_dir is set"]
         ]
       end
 
@@ -155,7 +176,7 @@ module Fastlane
         DeveloperDevicePlatform::Options.all
       end
 
-      private_class_method :build_gcloud, :build_command, :publish, :download, :conclude
+      private_class_method :build_gcloud, :build_command, :await, :cancel, :publish, :download, :conclude
     end
   end
 end
