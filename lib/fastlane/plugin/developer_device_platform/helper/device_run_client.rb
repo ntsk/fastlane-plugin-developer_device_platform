@@ -8,6 +8,15 @@ module Fastlane
       class Error < StandardError; end
 
       SESSION_ANNOUNCEMENT = /Creating session \[([^\]]+)\]/
+      MINIMUM_GCLOUD_VERSION = "580.0.0".freeze
+
+      ENVIRONMENT_HINTS = {
+        /Invalid choice: 'device-run'/ =>
+          "The installed gcloud does not provide the device-run command group. " \
+          "Device Run requires Google Cloud CLI #{MINIMUM_GCLOUD_VERSION} or newer; run `gcloud components update`.",
+        /installation of components: \[beta\]/ =>
+          "The gcloud beta component is not installed; run `gcloud components install beta`."
+      }.freeze
 
       attr_reader :gcloud
 
@@ -44,6 +53,15 @@ module Fastlane
 
       def device_run(*args, &progress)
         gcloud.run("beta", "device-run", *args, &progress)
+      rescue Gcloud::CommandError => e
+        hint = environment_hint(e.stderr)
+        raise e unless hint
+
+        raise Error, "#{hint}\n#{e.message}"
+      end
+
+      def environment_hint(stderr)
+        ENVIRONMENT_HINTS.find { |pattern, _| pattern.match?(stderr) }&.last
       end
     end
   end
