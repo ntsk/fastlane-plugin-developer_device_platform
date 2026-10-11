@@ -51,7 +51,7 @@ module Fastlane
           stderr_text = +""
           stderr.each_line do |line|
             stderr_text << line
-            yield(line.chomp) if block_given?
+            yield(line.chomp) if block_given? && !line.strip.empty?
           end
           [stdout_reader.value, stderr_text, waiter.value]
         end
