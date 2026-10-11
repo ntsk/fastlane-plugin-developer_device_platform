@@ -1,0 +1,8 @@
+#!/bin/sh
+printf '%s\n' "$@"
+echo "project=${CLOUDSDK_CORE_PROJECT-}"
+echo "credential=${CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE-}"
+echo "prompts=${CLOUDSDK_CORE_DISABLE_PROMPTS-}"
+echo "${FAKE_GCLOUD_STDERR:-first stderr line}" >&2
+echo "second stderr line" >&2
+exit "${FAKE_GCLOUD_EXIT:-0}"

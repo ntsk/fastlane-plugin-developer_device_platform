@@ -1,0 +1,17 @@
+{
+  "name": "projects/my-project/locations/global/sessions/3f9c2a1e",
+  "sessionConfig": {
+    "displayName": "instrumentation-session",
+    "outputDirectoryConfig": { "gcsOutputDirectory": { "path": "gs://my-project-devicerun/automation/sessions/" } }
+  },
+  "sessionReport": {
+    "id": "3f9c2a1e",
+    "status": { "statusType": "RUNNING", "progressMessages": ["Allocating devices."] },
+    "jobReports": [
+      {
+        "displayName": "job-000",
+        "status": { "statusType": "RUNNING", "progressMessages": ["Allocating device shiba-34."] }
+      }
+    ]
+  }
+}

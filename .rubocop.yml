@@ -26,6 +26,8 @@ Style/IfUnlessModifier:
   Enabled: false
 Style/GuardClause:
   Enabled: false
+Style/HashSyntax:
+  EnforcedShorthandSyntax: either
 Style/MethodCallWithArgsParentheses:
   Enabled: true
   AllowedMethods:
@@ -53,6 +55,9 @@ Style/MethodCallWithArgsParentheses:
     - puts
     - include
     - private_constant
+    - to
+    - not_to
+    - to_not
 
 Layout/LineLength:
   Max: 140
