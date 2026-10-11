@@ -5,7 +5,7 @@
 
 Run Android instrumentation tests on [Google Cloud Developer Device Platform](https://docs.cloud.google.com/developer-device-platform) (Device Run) from fastlane.
 
-Firebase Test Lab is [deprecated and shuts down on September 30, 2027](https://firebase.google.com/docs/test-lab/migrate-faq). Developer Device Platform is its successor on Google Cloud. This plugin is a drop-in replacement for [fastlane-plugin-firebase_test_lab_android](https://github.com/cats-oss/fastlane-plugin-firebase_test_lab_android) built on `gcloud beta device-run`.
+Firebase Test Lab is [deprecated and shuts down on September 30, 2027](https://firebase.google.com/docs/test-lab/migrate-faq). Developer Device Platform is its successor on Google Cloud. This plugin wraps `gcloud beta device-run` so Android instrumentation tests can keep running from a fastlane lane.
 
 ## What the action does
 
@@ -135,23 +135,6 @@ Artifacts land in `gs://BUCKET/automation/sessions/SESSION_ID/job-NNN/`: `merged
 On CI, the simplest setup is a service account key passed through `service_account_key_file`. The plugin hands it to gcloud via `CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE`, so the global gcloud configuration is left untouched. If your CI already authenticates gcloud (for example with Workload Identity Federation through `google-github-actions/auth`), omit the option and the active credentials are used.
 
 Device Run reads inputs and writes results through its own service agent (`service-PROJECT_NUMBER@gcp-sa-devicerun.iam.gserviceaccount.com`). When you point `bucket_name` at a bucket in another project, grant that agent `roles/storage.objectViewer` on it (see [Share storage](https://docs.cloud.google.com/developer-device-platform/device-run/share-storage)).
-
-## Migrating from fastlane-plugin-firebase_test_lab_android
-
-| firebase_test_lab_android | developer_device_platform |
-| --- | --- |
-| `project_id` | `project_id` |
-| `gcloud_service_key_file` | `service_account_key_file` |
-| `type: "instrumentation"` | Only instrumentation tests are supported by Device Run. Robo tests have no equivalent. |
-| `devices: [{ model:, version:, locale:, orientation: }]` | `devices: ["<model>-<version>"]`, plus `locale` and `orientation` applied to every device |
-| `app_apk` / `app_test_apk` | `apps: [app_apk]` / `test_apk` |
-| `use_orchestrator: true` | `orchestrator_version: "auto"` |
-| `timeout` | `instrumentation_timeout` |
-| `firebase_test_lab_results_bucket` | `bucket_name` |
-| `firebase_test_lab_results_dir` | Not supported. Results are grouped by session ID. |
-| `download_dir` | `download_dir` |
-| `extra_options` | The corresponding typed option (`test_targets`, `additional_test_options`, `video`, ...) |
-| `slack_url`, `github_*` | Not included. Use `slack` or GitHub actions with the lane context values above. |
 
 ## Development
 
