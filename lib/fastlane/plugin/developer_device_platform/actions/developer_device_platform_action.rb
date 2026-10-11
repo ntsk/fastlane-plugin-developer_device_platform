@@ -88,14 +88,12 @@ module Fastlane
       end
 
       def self.details
-        <<~DETAILS
-          Uploads your app and test APKs to Google Cloud Storage, submits an instrumentation
-          session to Device Run (the successor of Firebase Test Lab), waits for it to finish and
-          reports the per-job results. Requires the Google Cloud CLI (`gcloud`) with the Device Run
-          API (devicerun.googleapis.com) enabled on the project.
-
-          Options mirror the flags of `gcloud beta device-run sessions submit instrumentation`.
-        DETAILS
+        [
+          "Uploads your app and test APKs to Google Cloud Storage, submits an instrumentation session to Device Run",
+          "(the successor of Firebase Test Lab), waits for it to finish and reports the per-job results.",
+          "Requires the Google Cloud CLI (`gcloud`) with the Device Run API (devicerun.googleapis.com) enabled on the project.",
+          "Options mirror the flags of `gcloud beta device-run sessions submit instrumentation`."
+        ].join(" ")
       end
 
       def self.authors
