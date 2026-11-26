@@ -1,9 +1,11 @@
-require:
+plugins:
   - rubocop-performance
+
+require:
   - rubocop-require_tools
 
 AllCops:
-  TargetRubyVersion: 3.1
+  TargetRubyVersion: 3.2
   NewCops: enable
   SuggestExtensions: false
   Exclude:
@@ -28,6 +30,8 @@ Style/GuardClause:
   Enabled: false
 Style/HashSyntax:
   EnforcedShorthandSyntax: either
+Style/ArgumentsForwarding:
+  UseAnonymousForwarding: false
 Style/MethodCallWithArgsParentheses:
   Enabled: true
   AllowedMethods:
@@ -81,7 +85,7 @@ Metrics/PerceivedComplexity:
 Metrics/ParameterLists:
   Max: 8
 
-Naming/PredicateName:
+Naming/PredicatePrefix:
   Enabled: false
 
 Lint/UnusedMethodArgument:
